@@ -1,0 +1,644 @@
+game.StarterGui:SetCore("SendNotification", {
+    Title = "The Final Stand 2";
+    Text = "Create by HAPPY script";
+    Duration = 7;
+    Icon = "rbxthumb://type=Asset&id=11703958389&w=150&h=150";
+})
+
+local player = game.Players.LocalPlayer
+local userInputService = game:GetService("UserInputService")
+
+-- Tạo GUI chứa nút icon
+local iconGui = Instance.new("ScreenGui", player:WaitForChild("PlayerGui"))
+iconGui.ResetOnSpawn = false
+
+-- Tạo nút icon
+local iconButton = Instance.new("ImageButton")
+iconButton.Size = UDim2.new(0, 50, 0, 50)
+iconButton.Position = UDim2.new(0.05, 0, 0.05, 0) -- Vị trí ban đầu
+iconButton.BackgroundTransparency = 1
+iconButton.Image = "rbxthumb://type=Asset&id=86710626358228&w=150&h=150" -- Icon bạn yêu cầu
+iconButton.Parent = iconGui
+
+-- Kéo thả nút icon
+local dragging, dragInput, dragStart, startPos
+
+iconButton.InputBegan:Connect(function(input)
+    if input.UserInputType == Enum.UserInputType.MouseButton1 then
+        dragging = true
+        dragStart = input.Position
+        startPos = iconButton.Position
+
+        input.Changed:Connect(function()
+            if input.UserInputState == Enum.UserInputState.End then
+                dragging = false
+            end
+        end)
+    end
+end)
+
+iconButton.InputChanged:Connect(function(input)
+    if input.UserInputType == Enum.UserInputType.MouseMovement then
+        dragInput = input
+    end
+end)
+
+userInputService.InputChanged:Connect(function(input)
+    if dragging and input == dragInput then
+        local delta = input.Position - dragStart
+        iconButton.Position = UDim2.new(startPos.X.Scale, startPos.X.Offset + delta.X, startPos.Y.Scale, startPos.Y.Offset + delta.Y)
+    end
+end)
+
+-- Biến kiểm soát menu
+local menuVisible = false
+local mainFrame = nil -- Biến chứa Frame chính của menu
+
+-- Sự kiện khi bấm vào icon
+iconButton.MouseButton1Click:Connect(function()
+    if mainFrame then
+        menuVisible = not menuVisible
+        mainFrame.Visible = menuVisible -- Hiện hoặc ẩn menu
+    else
+        print("Menu chưa được gán! Hãy dán script menu vào và gán biến mainFrame.")
+    end
+end)
+
+local player = game.Players.LocalPlayer
+local UserInputService = game:GetService("UserInputService")
+
+-- Tạo GUI
+local ScreenGui = Instance.new("ScreenGui", player:WaitForChild("PlayerGui"))
+ScreenGui.ResetOnSpawn = false
+
+local Frame = Instance.new("Frame")
+Frame.Size = UDim2.new(0, 400, 0, 300)
+Frame.Position = UDim2.new(0.3, 0, 0.3, 0)
+Frame.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
+Frame.BorderSizePixel = 2
+Frame.Parent = ScreenGui
+mainFrame = Frame -- Gán biến cho Frame chính của menu
+mainFrame.Visible = false -- Ẩn menu lúc đầu
+
+-- Cải thiện kéo thả menu
+local dragging, dragInput, dragStart, startPos
+
+Frame.InputBegan:Connect(function(input)
+    if input.UserInputType == Enum.UserInputType.MouseButton1 then
+        dragging = true
+        dragStart = input.Position
+        startPos = Frame.Position
+        input.Changed:Connect(function()
+            if input.UserInputState == Enum.UserInputState.End then
+                dragging = false
+            end
+        end)
+    end
+end)
+
+Frame.InputChanged:Connect(function(input)
+    if input.UserInputType == Enum.UserInputType.MouseMovement then
+        dragInput = input
+    end
+end)
+
+UserInputService.InputChanged:Connect(function(input)
+    if input == dragInput and dragging then
+        local delta = input.Position - dragStart
+        Frame.Position = UDim2.new(startPos.X.Scale, startPos.X.Offset + delta.X, startPos.Y.Scale, startPos.Y.Offset + delta.Y)
+    end
+end)
+
+-- Danh sách tab (Dễ dàng thêm tab mới)
+local tabs = {
+    {name = "Page change", icon = "rbxthumb://type=Asset&id=1587302690&w=150&h=150"},
+    {name = "Home", icon = "rbxthumb://type=Asset&id=13060262582&w=150&h=150"},
+    {name = "Visual", icon = "rbxthumb://type=Asset&id=17688532644&w=150&h=150"},
+    {name = "Player", icon = "rbxthumb://type=Asset&id=124871982298256&w=150&h=150"},
+    {name = "Info", icon = "rbxthumb://type=Asset&id=11780939142&w=150&h=150"}
+}
+
+-- Tạo phần tab (bên trái)
+local TabFrame = Instance.new("ScrollingFrame")
+TabFrame.Size = UDim2.new(0, 50, 1, 0)
+TabFrame.Position = UDim2.new(0, 0, 0, 5) -- Hạ thấp tab xuống để Home không bị che
+TabFrame.BackgroundColor3 = Color3.fromRGB(40, 40, 40)
+TabFrame.ScrollBarThickness = 5
+TabFrame.CanvasSize = UDim2.new(0, 0, 0, #tabs * 50) -- Đảm bảo đủ khoảng trống để lăn chuột
+TabFrame.Parent = Frame
+
+-- Tạo phần chính (chứa các nút)
+local ContentFrame = Instance.new("ScrollingFrame")
+ContentFrame.Size = UDim2.new(1, -60, 1, -30)
+ContentFrame.Position = UDim2.new(0, 55, 0, 30)
+ContentFrame.BackgroundColor3 = Color3.fromRGB(50, 50, 50)
+ContentFrame.ScrollBarThickness = 5
+ContentFrame.CanvasSize = UDim2.new(0, 0, 1.5, 0)
+ContentFrame.Parent = Frame
+
+-- Tiêu đề menu
+local TitleLabel = Instance.new("TextLabel")
+TitleLabel.Size = UDim2.new(1, 0, 0, 30)
+TitleLabel.Position = UDim2.new(0, 0, 0, 0)
+TitleLabel.BackgroundColor3 = Color3.fromRGB(50, 50, 50)
+TitleLabel.Text = "Menu"
+TitleLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
+TitleLabel.Font = Enum.Font.SourceSansBold
+TitleLabel.TextSize = 20
+TitleLabel.TextXAlignment = Enum.TextXAlignment.Center
+TitleLabel.Parent = Frame
+
+-- Chứa các khung chức năng theo từng tab
+local sections = {}
+
+for i, tab in ipairs(tabs) do
+    -- Tạo nút tab
+    local TabButton = Instance.new("ImageButton")
+    TabButton.Size = UDim2.new(0, 40, 0, 40)
+    TabButton.Position = UDim2.new(0, 5, 0, (i - 1) * 45 + 10) -- Hạ xuống để không che Home
+    TabButton.Image = tab.icon
+    TabButton.BackgroundTransparency = 1
+    TabButton.Parent = TabFrame
+
+    -- Tạo khung chứa nội dung của từng tab
+    local SectionFrame = Instance.new("Frame")
+    SectionFrame.Size = UDim2.new(1, 0, 1, 0)
+    SectionFrame.BackgroundTransparency = 1
+    SectionFrame.Visible = (i == 1)
+    SectionFrame.Parent = ContentFrame
+    sections[tab.name] = SectionFrame
+
+    -- Sự kiện khi bấm vào tab
+    TabButton.MouseButton1Click:Connect(function()
+        for _, section in pairs(sections) do
+            section.Visible = false
+        end
+        SectionFrame.Visible = true
+        TitleLabel.Text = tab.name
+    end)
+end
+
+-- Sửa lỗi lăn chuột tab
+TabFrame.MouseWheelForward:Connect(function()
+    TabFrame.CanvasPosition = TabFrame.CanvasPosition - Vector2.new(0, 30)
+end)
+
+TabFrame.MouseWheelBackward:Connect(function()
+    TabFrame.CanvasPosition = TabFrame.CanvasPosition + Vector2.new(0, 30)
+end)
+
+-- 🚀 **Thêm chức năng vào tab "Home"**
+local function CreateButton(parent, text, position, callback)
+    local Button = Instance.new("TextButton")
+    Button.Size = UDim2.new(0.9, 0, 0, 40)
+    Button.Position = UDim2.new(0.05, 0, 0, position)
+    Button.BackgroundColor3 = Color3.fromRGB(60, 60, 60)
+    Button.Text = text
+    Button.TextColor3 = Color3.new(1, 1, 1)
+    Button.Font = Enum.Font.SourceSansBold
+    Button.TextSize = 16
+    Button.Parent = parent
+    Button.MouseButton1Click:Connect(callback)
+end
+
+-------------------------------------------------------------------------------------------------------------------------------
+--aimbot zombie PC
+local HomeFrame = sections["Home"]
+local player = game.Players.LocalPlayer
+local camera = workspace.CurrentCamera
+local userInputService = game:GetService("UserInputService")
+local runService = game:GetService("RunService")
+
+local aimModEnabled = false
+local selectedKey = Enum.KeyCode.F
+local isKeyHeld = false
+local waitingForKey = false
+
+-- 🟢 Nút bật/tắt Aim Mod
+local AimModButton = Instance.new("TextButton", HomeFrame)
+AimModButton.Size = UDim2.new(0, 190, 0, 40)
+AimModButton.Position = UDim2.new(0, 10, 0, 60)
+AimModButton.Text = "[🖥️]ON Aim Mod🎯"
+AimModButton.BackgroundColor3 = Color3.new(0.2, 0.2, 0.2)
+AimModButton.TextColor3 = Color3.new(1, 1, 1)
+
+-- 🔵 Nút chọn phím Aim Mod
+local KeybindButton = Instance.new("TextButton", HomeFrame)
+KeybindButton.Size = UDim2.new(0, 100, 0, 40)
+KeybindButton.Position = UDim2.new(0, 210, 0, 60)
+KeybindButton.Text = "Select key: F"
+KeybindButton.BackgroundColor3 = Color3.new(0.2, 0.2, 0.8)
+KeybindButton.TextColor3 = Color3.new(1, 1, 1)
+
+-- 🔹 Khi bấm nút bật Aim Mod
+AimModButton.MouseButton1Click:Connect(function()
+    aimModEnabled = not aimModEnabled
+    AimModButton.Text = aimModEnabled and "[🖥️]OFF Aim Mod🎯" or "[🖥️]ON Aim Mod🎯"
+    AimModButton.BackgroundColor3 = aimModEnabled and Color3.new(0, 1, 0) or Color3.new(0.2, 0.2, 0.2)
+end)
+
+-- 🔹 Khi bấm nút chọn phím
+KeybindButton.MouseButton1Click:Connect(function()
+    KeybindButton.Text = "Select key..."
+    waitingForKey = true
+end)
+
+-- 🔹 Xử lý chọn phím và bấm giữ phím
+userInputService.InputBegan:Connect(function(input, gameProcessed)
+    if waitingForKey and input.UserInputType == Enum.UserInputType.Keyboard then
+        selectedKey = input.KeyCode
+        KeybindButton.Text = "Select key: " .. tostring(selectedKey):gsub("Enum.KeyCode.", "")
+        waitingForKey = false
+    elseif input.KeyCode == selectedKey then
+        isKeyHeld = true
+    end
+end)
+
+userInputService.InputEnded:Connect(function(input)
+    if input.KeyCode == selectedKey then
+        isKeyHeld = false
+    end
+end)
+
+-- 🔹 **Tìm zombie gần nhất để Aim**
+local function GetClosestZombieHead()
+    local closestHead = nil
+    local closestDistance = math.huge
+    local crosshair = Vector2.new(camera.ViewportSize.X / 2, camera.ViewportSize.Y / 2)
+    local maxRadius = 200
+
+    local zombiesFolder = workspace:FindFirstChild("Zombies")
+    if not zombiesFolder then return nil end
+
+    for _, model in pairs(zombiesFolder:GetChildren()) do
+        if model:IsA("Model") then
+            local head = model:FindFirstChild("Head")
+            if head and head:IsA("Part") then
+                local screenPoint, onScreen = camera:WorldToViewportPoint(head.Position)
+                if onScreen then
+                    local screenPos = Vector2.new(screenPoint.X, screenPoint.Y)
+                    local screenDistance = (screenPos - crosshair).magnitude
+                    if screenDistance < closestDistance and screenDistance <= maxRadius then
+                        closestDistance = screenDistance
+                        closestHead = head
+                    end
+                end
+            end
+        end
+    end
+    return closestHead
+end
+
+-- 🔹 **Cập nhật Aim**
+local function AimAtTarget()
+    if not aimModEnabled or not isKeyHeld then return end
+
+    local targetHead = GetClosestZombieHead()
+    if targetHead then
+        camera.CFrame = CFrame.new(camera.CFrame.Position, targetHead.Position)
+    end
+end
+
+runService.RenderStepped:Connect(AimAtTarget)
+
+-- 🔄 **Reset trạng thái khi hồi sinh**
+player.CharacterAdded:Connect(function()
+    aimModEnabled = false
+    isKeyHeld = false
+    AimModButton.Text = "[🖥️]ON Aim Mod🎯"
+    AimModButton.BackgroundColor3 = Color3.new(0.2, 0.2, 0.2)
+end)
+
+-------------------------------------------------------------------------------------------------------------------------------
+--aimbot zombie PE
+local HomeFrame = sections["Home"]
+local player = game.Players.LocalPlayer
+local camera = workspace.CurrentCamera
+local userInputService = game:GetService("UserInputService")
+local runService = game:GetService("RunService")
+local mouse = player:GetMouse()
+
+local silentAimEnabled = false
+local isAimHeld = false
+
+-- 🟢 NÚT BẬT/TẮT AIM (TRONG HOME TAB)
+local AimButton = Instance.new("TextButton", HomeFrame)
+AimButton.Size = UDim2.new(0, 300, 0, 40)
+AimButton.Position = UDim2.new(0, 10, 0, 10)
+AimButton.Text = "[📱]ON Aim Mod🎯"
+AimButton.BackgroundColor3 = Color3.new(0.2, 0.2, 0.2)
+AimButton.TextColor3 = Color3.new(1, 1, 1)
+
+-- 🟢 NÚT AIM TRÊN MÀN HÌNH (DÀNH CHO PE)
+local screenGui = Instance.new("ScreenGui", game.CoreGui)
+local MobileAimButton = Instance.new("TextButton", screenGui)
+MobileAimButton.Size = UDim2.new(0, 40, 0, 40) 
+MobileAimButton.Position = UDim2.new(0.89, 0, 0.5, -70) -- CAO HƠN NÚT TP
+MobileAimButton.BackgroundColor3 = Color3.fromRGB(100, 100, 100)
+MobileAimButton.BackgroundTransparency = 0.5
+MobileAimButton.Text = "🎯"
+MobileAimButton.TextScaled = true
+MobileAimButton.TextColor3 = Color3.new(1, 1, 1)
+MobileAimButton.Visible = false
+
+-- Bo tròn nút Aim
+local UICorner = Instance.new("UICorner", MobileAimButton)
+UICorner.CornerRadius = UDim.new(1, 0)
+
+-- 🟢 BẬT/TẮT CHỨC NĂNG AIM
+local function ToggleAim()
+    silentAimEnabled = not silentAimEnabled
+    AimButton.Text = silentAimEnabled and "[📱]OFF Aim Mod🎯" or "[📱]ON Aim Mod🎯"
+    AimButton.BackgroundColor3 = silentAimEnabled and Color3.new(0, 1, 0) or Color3.new(0.2, 0.2, 0.2)
+
+    -- Hiện nút Aim khi bật chức năng
+    MobileAimButton.Visible = silentAimEnabled
+    MobileAimButton.BackgroundColor3 = Color3.fromRGB(100, 100, 100)
+end
+
+AimButton.MouseButton1Click:Connect(ToggleAim)
+
+-- 🟢 GIỮ NÚT AIM ĐỂ BẬT AIM MOD
+MobileAimButton.MouseButton1Down:Connect(function()
+    if silentAimEnabled then
+        isAimHeld = true
+        MobileAimButton.BackgroundColor3 = Color3.fromRGB(0, 0, 139) -- Chuyển sang màu xanh dương khi giữ
+    end
+end)
+
+MobileAimButton.MouseButton1Up:Connect(function()
+    isAimHeld = false
+    MobileAimButton.BackgroundColor3 = Color3.fromRGB(100, 100, 100) -- Reset về màu xám
+end)
+
+-- 🟢 HÀM TÌM VÀ AIM VÀO ZOMBIE TRONG ZOMBIES FOLDER
+local function GetClosestZombieHeadInRange()
+    local closestHead = nil
+    local closestScreenDistance = math.huge
+    local crosshairPosition = Vector2.new(camera.ViewportSize.X / 2, camera.ViewportSize.Y / 2)
+    local maxRadius = 200
+    
+    local zombiesFolder = workspace:FindFirstChild("Zombies")
+    if zombiesFolder then
+        for _, model in pairs(zombiesFolder:GetChildren()) do
+            if model:IsA("Model") then
+                local head = model:FindFirstChild("Head")
+                if head and head:IsA("Part") then
+                    local screenPoint, onScreen = camera:WorldToViewportPoint(head.Position)
+                    if onScreen then
+                        local screenPosition = Vector2.new(screenPoint.X, screenPoint.Y)
+                        local screenDistance = (screenPosition - crosshairPosition).magnitude
+                        if screenDistance < closestScreenDistance and screenDistance <= maxRadius then
+                            closestScreenDistance = screenDistance
+                            closestHead = head
+                        end
+                    end
+                end
+            end
+        end
+    end
+    return closestHead
+end
+
+local function AimAtZombieHead()
+    if not silentAimEnabled or not isAimHeld then return end
+
+    local targetHead = GetClosestZombieHeadInRange()
+    if targetHead then
+        camera.CFrame = CFrame.new(camera.CFrame.Position, targetHead.Position)
+    end
+end
+
+runService.RenderStepped:Connect(AimAtZombieHead)
+
+-- 🟢 RESET TRẠNG THÁI KHI CHẾT
+player.CharacterAdded:Connect(function()
+    silentAimEnabled = false
+    isAimHeld = false
+    AimButton.Text = "[📱]ON Aim Mod🎯"
+    AimButton.BackgroundColor3 = Color3.new(0.2, 0.2, 0.2)
+    MobileAimButton.Visible = false
+    MobileAimButton.BackgroundColor3 = Color3.fromRGB(100, 100, 100)
+end)
+
+-------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+--ESP MOD (Chỉ hiển thị ESP cho quái trong workspace.Zombies)
+local HomeFrame = sections["Visual"]
+local player = game.Players.LocalPlayer
+local userInputService = game:GetService("UserInputService")
+
+local espEnabled = false
+local menuVisible = false
+local espObjects = {}
+
+-- Nút mở ESP Menu
+local espButton = Instance.new("TextButton", HomeFrame)
+espButton.Size = UDim2.new(0, 300, 0, 40)
+espButton.Position = UDim2.new(0, 10, 0, 60)
+espButton.Text = "👿MENU ESP ZOMBIE"
+espButton.BackgroundColor3 = Color3.new(0.35, 0, 0)
+espButton.TextColor3 = Color3.new(139, 0, 0)
+
+-- Menu ESP
+local screenGui = Instance.new("ScreenGui", player:WaitForChild("PlayerGui"))
+local espMenu = Instance.new("Frame", screenGui)
+espMenu.Size = UDim2.new(0, 150, 0, 100)
+espMenu.Position = UDim2.new(0.5, -75, 0.2, 0)
+espMenu.BackgroundColor3 = Color3.new(139, 0, 0)
+espMenu.BorderSizePixel = 2
+espMenu.Active = true
+espMenu.Visible = false
+
+-- Nút bật/tắt ESP
+local toggleButton = Instance.new("TextButton", espMenu)
+toggleButton.Size = UDim2.new(1, 0, 0.6, 0)
+toggleButton.Position = UDim2.new(0, 0, 0.2, 0)
+toggleButton.Text = "Bật ESP"
+toggleButton.BackgroundColor3 = Color3.new(0.5, 0.5, 0.5)
+toggleButton.TextColor3 = Color3.new(1, 1, 1)
+
+-- Cập nhật menu hiển thị
+local function updateMenuVisibility()
+    espMenu.Visible = menuVisible
+end
+
+espButton.MouseButton1Click:Connect(function()
+    menuVisible = not menuVisible
+    updateMenuVisibility()
+end)
+
+-- Chức năng ESP
+local function createESP(obj)
+    if obj:IsA("Model") then
+        local highlight = Instance.new("Highlight")
+        highlight.Adornee = obj
+        highlight.FillColor = Color3.new(1, 0, 0)
+        highlight.OutlineColor = Color3.new(1, 0, 0)
+        highlight.FillTransparency = 1
+        highlight.OutlineTransparency = 0
+        highlight.Parent = obj
+
+        local billboardGui = Instance.new("BillboardGui")
+        billboardGui.Adornee = obj
+        billboardGui.Size = UDim2.new(0, 100, 0, 50)
+        billboardGui.StudsOffset = Vector3.new(0, 3, 0)
+        billboardGui.AlwaysOnTop = true
+        billboardGui.Parent = obj
+
+        local textLabel = Instance.new("TextLabel")
+        textLabel.Size = UDim2.new(1, 0, 1, 0)
+        textLabel.BackgroundTransparency = 1
+        textLabel.TextColor3 = Color3.new(1, 0, 0)
+        textLabel.TextSize = 16
+        textLabel.Font = Enum.Font.SourceSansBold
+        textLabel.Text = obj.Name
+        textLabel.Parent = billboardGui
+
+        table.insert(espObjects, highlight)
+        table.insert(espObjects, billboardGui)
+    end
+end
+
+-- Tìm và tạo ESP cho quái trong workspace.Zombies
+local function findAndESP()
+    local zombiesFolder = workspace:FindFirstChild("Zombies")
+    if zombiesFolder then
+        for _, obj in pairs(zombiesFolder:GetChildren()) do
+            createESP(obj)
+        end
+        zombiesFolder.ChildAdded:Connect(createESP)
+    end
+end
+
+local function toggleESP(state)
+    if state then
+        findAndESP()
+    else
+        for _, esp in pairs(espObjects) do
+            esp:Destroy()
+        end
+        espObjects = {}
+    end
+end
+
+toggleButton.MouseButton1Click:Connect(function()
+    espEnabled = not espEnabled
+    toggleButton.Text = espEnabled and "Tắt ESP" or "Bật ESP"
+    toggleButton.BackgroundColor3 = espEnabled and Color3.new(0, 1, 0) or Color3.new(0.5, 0.5, 0.5)
+    toggleESP(espEnabled)
+end)
+
+------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+--Light
+local VisualFrame = sections["Visual"] -- Lấy phần chứa nội dung của tab "Visual"
+local lighting = game:GetService("Lighting")
+
+local lightEnabled = false -- Trạng thái bật/tắt ánh sáng
+
+-- Tạo nút Light
+local lightButton = Instance.new("TextButton", VisualFrame)
+lightButton.Size = UDim2.new(0, 300, 0, 40)
+lightButton.Position = UDim2.new(0, 10, 0, 10)
+lightButton.Text = "☀Light OFF"
+lightButton.BackgroundColor3 = Color3.new(0.3, 0.3, 0.3)
+lightButton.TextColor3 = Color3.new(1, 1, 1)
+
+-- Chức năng bật/tắt ánh sáng
+local function toggleLight(state)
+    if state then
+        lighting.Brightness = 3 -- Tăng độ sáng
+        lighting.Ambient = Color3.new(1, 1, 1) -- Làm sáng môi trường
+        lighting.OutdoorAmbient = Color3.new(1, 1, 1) -- Giảm độ tối bên ngoài
+        lighting.GlobalShadows = false -- Tắt bóng tối
+    else
+        lighting.Brightness = 1 -- Trả về độ sáng ban đầu
+        lighting.Ambient = Color3.new(0.5, 0.5, 0.5)
+        lighting.OutdoorAmbient = Color3.new(0.5, 0.5, 0.5)
+        lighting.GlobalShadows = true -- Bật bóng tối lại
+    end
+end
+
+-- Nút bật/tắt ánh sáng
+lightButton.MouseButton1Click:Connect(function()
+    lightEnabled = not lightEnabled
+    lightButton.Text = lightEnabled and "☀Light ON" or "☀Light OFF"
+    lightButton.BackgroundColor3 = lightEnabled and Color3.new(1, 1, 0.39) or Color3.new(0.3, 0.3, 0.3)
+    toggleLight(lightEnabled)
+end)
+
+------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+--Player view
+local PlayerFrame = sections["Player"] -- Lấy phần chứa nội dung của tab "Player"
+local players = game:GetService("Players")
+local localPlayer = players.LocalPlayer
+local camera = game.Workspace.CurrentCamera
+
+local buttons = {} -- Lưu các nút của người chơi
+local originalCameraSubject = camera.CameraSubject -- Lưu trạng thái camera ban đầu
+local viewingPlayer = nil -- Người chơi đang được xem
+
+-- Hàm cập nhật danh sách người chơi
+local function updatePlayerList()
+    -- Xóa các nút cũ trước khi tạo mới
+    for _, button in pairs(buttons) do
+        button:Destroy()
+    end
+    buttons = {}
+
+    -- Tạo danh sách nút người chơi
+    local yOffset = 10 -- Vị trí y ban đầu
+    for _, player in pairs(players:GetPlayers()) do
+        if player ~= localPlayer then -- Không hiển thị bản thân
+            local PlayerButton = Instance.new("TextButton", PlayerFrame)
+            PlayerButton.Size = UDim2.new(0, 300, 0, 40)
+            PlayerButton.Position = UDim2.new(0, 10, 0, yOffset)
+            PlayerButton.Text = player.Name
+            PlayerButton.BackgroundColor3 = Color3.new(0.2, 0.2, 0.2)
+            PlayerButton.TextColor3 = Color3.new(1, 1, 1)
+
+            -- Khi bấm vào nút
+            PlayerButton.MouseButton1Click:Connect(function()
+                if viewingPlayer == player then
+                    -- Nếu đang xem người này, quay về bản thân
+                    camera.CameraSubject = localPlayer.Character and localPlayer.Character:FindFirstChild("Humanoid") or camera.CameraSubject
+                    viewingPlayer = nil
+                else
+                    -- Chuyển camera qua người chơi được chọn
+                    if player.Character and player.Character:FindFirstChild("Humanoid") then
+                        camera.CameraSubject = player.Character.Humanoid
+                        viewingPlayer = player
+                    end
+                end
+            end)
+
+            table.insert(buttons, PlayerButton) -- Lưu nút vào danh sách
+            yOffset = yOffset + 50 -- Dịch vị trí xuống dòng tiếp theo
+        end
+    end
+end
+
+-- Khi có người vào hoặc rời khỏi server, cập nhật danh sách
+players.PlayerAdded:Connect(updatePlayerList)
+players.PlayerRemoving:Connect(updatePlayerList)
+
+-- Cập nhật danh sách ban đầu khi script chạy
+updatePlayerList()
+
+--------------------------------------------------------------------------------------------------------------------------
+--Info
+local InfoFrame = sections["Info"] -- Lấy phần chứa nội dung của tab "Info"
+
+local function copyToClipboard(text)
+    if setclipboard then
+        setclipboard(text)
+    elseif toclipboard then
+        toclipboard(text)
+    else
+        print("Không thể sao chép, script không hỗ trợ clipboard!")
+    end
+end
+
+-- Tạo nút "Discord"
+CreateButton(InfoFrame, "👾 Discord", 10, function()
+    copyToClipboard("https://discord.gg/HSEfQPzdpH") -- Thay link này bằng link Discord của bạn
+end)
